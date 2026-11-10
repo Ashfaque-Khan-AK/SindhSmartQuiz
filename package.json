@@ -9,6 +9,7 @@
     "dev:server": "npm run dev --prefix server",
     "dev:client": "npm run dev --prefix client",
     "seed": "npm run seed --prefix server",
+    "seed:admin": "npm run seed:admin --prefix server",
     "seed:fresh": "npm run seed --prefix server -- --fresh",
     "build": "npm run build --prefix client",
     "start": "npm run start --prefix server"

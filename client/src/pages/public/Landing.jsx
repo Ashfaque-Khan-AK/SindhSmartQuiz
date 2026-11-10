@@ -13,14 +13,12 @@ import {
   Languages,
   Menu,
   MousePointerClick,
-  ShieldCheck,
   Sparkles,
   Star,
   Target,
   TrendingUp,
   Trophy,
   UserPlus,
-  UserRound,
   X,
   Zap,
 } from 'lucide-react';
@@ -284,63 +282,6 @@ export default function Landing() {
                 <p className="flex items-center gap-1.5 text-xs font-extrabold">
                   <Trophy size={14} /> Quick Learner
                 </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Demo access */}
-        <section className="mx-auto w-full max-w-7xl px-4 pt-10 sm:px-6 lg:px-8">
-          <div className="app-card p-5 sm:p-6">
-            <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-              <div className="max-w-xl">
-                <span className="section-label">
-                  <Sparkles size={14} /> {t('auth.demoCredentials')}
-                </span>
-                <h2 className="mt-3 text-xl font-bold sm:text-2xl">{t('landing.demoTitle')}</h2>
-                <p className="mt-2 text-sm leading-relaxed text-base-content/60">
-                  {t('landing.demoSubtitle')}
-                </p>
-              </div>
-
-              <div className="grid gap-3 sm:grid-cols-2 lg:min-w-[30rem]">
-                <Link
-                  to="/login"
-                  className="group flex items-center gap-3 rounded-2xl border border-base-300 bg-base-100 p-4 transition hover:border-primary/40 hover:shadow-sm"
-                >
-                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
-                    <UserRound size={19} />
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="block text-[10px] font-bold uppercase tracking-wider text-base-content/45">
-                      {t('auth.studentDemo')}
-                    </span>
-                    <span className="mt-1 block truncate text-sm font-semibold">
-                      student@sindhsmartquiz.pk
-                    </span>
-                    <span className="block text-xs text-base-content/50">Student@12345</span>
-                  </span>
-                  <ArrowRight size={16} className="shrink-0 text-base-content/35 transition group-hover:text-primary" />
-                </Link>
-
-                <Link
-                  to="/admin/login"
-                  className="group flex items-center gap-3 rounded-2xl border border-base-300 bg-base-100 p-4 transition hover:border-primary/40 hover:shadow-sm"
-                >
-                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-secondary/15 text-amber-600">
-                    <ShieldCheck size={19} />
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="block text-[10px] font-bold uppercase tracking-wider text-base-content/45">
-                      {t('auth.adminDemo')}
-                    </span>
-                    <span className="mt-1 block truncate text-sm font-semibold">
-                      admin@sindhsmartquiz.pk
-                    </span>
-                    <span className="block text-xs text-base-content/50">Admin@12345</span>
-                  </span>
-                  <ArrowRight size={16} className="shrink-0 text-base-content/35 transition group-hover:text-primary" />
-                </Link>
               </div>
             </div>
           </div>

@@ -22,14 +22,6 @@ export default function Login({ admin = false }) {
     setForm((previous) => ({ ...previous, [field]: event.target.value }));
   };
 
-  const fillDemo = () => {
-    setForm(
-      admin
-        ? { email: 'admin@sindhsmartquiz.pk', password: 'Admin@12345' }
-        : { email: 'student@sindhsmartquiz.pk', password: 'Student@12345' }
-    );
-  };
-
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (!form.email.trim() || !form.password) {
@@ -88,7 +80,7 @@ export default function Login({ admin = false }) {
               id="email"
               type="email"
               className="app-input ps-10"
-              placeholder={admin ? 'admin@sindhsmartquiz.pk' : 'you@example.com'}
+              placeholder="you@example.com"
               value={form.email}
               onChange={update('email')}
               autoComplete="email"
@@ -128,23 +120,6 @@ export default function Login({ admin = false }) {
           {admin ? <ShieldCheck size={18} /> : <LogIn size={18} />}
           {submitting ? t('common.loading') : admin ? t('auth.adminButton') : t('auth.loginButton')}
         </button>
-
-        <div className="rounded-2xl bg-base-200/70 p-3">
-          <div className="mb-2 flex items-center justify-between">
-            <p className="text-[11px] font-bold uppercase tracking-wider text-base-content/50">
-              {t('auth.demoCredentials')}
-            </p>
-            <button type="button" onClick={fillDemo} className="link link-primary text-xs font-semibold">
-              {t('auth.fillDemo')}
-            </button>
-          </div>
-          <p className="font-mono text-xs text-base-content/65">
-            {admin ? 'admin@sindhsmartquiz.pk' : 'student@sindhsmartquiz.pk'}
-          </p>
-          <p className="font-mono text-xs text-base-content/65">
-            {admin ? 'Admin@12345' : 'Student@12345'}
-          </p>
-        </div>
       </form>
     </AuthCard>
   );

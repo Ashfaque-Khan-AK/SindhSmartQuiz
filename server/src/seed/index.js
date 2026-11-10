@@ -10,10 +10,9 @@ import Topic from '../models/Topic.js';
 import User from '../models/User.js';
 import { evaluateAchievements } from '../services/achievement.service.js';
 import { ACHIEVEMENTS, CURRICULUM, QUESTION_BANK, SUBJECTS } from './data/index.js';
+import { ADMIN_EMAIL, ADMIN_NAME, ADMIN_PASSWORD } from './adminCredentials.js';
 
 const DEMO_PASSWORD = 'Student@12345';
-const ADMIN_EMAIL = 'admin@sindhsmartquiz.pk';
-const ADMIN_PASSWORD = 'Admin@12345';
 
 const DEMO_STUDENTS = [
   { name: 'Ali Raza', email: 'student@sindhsmartquiz.pk', grade: 8, language: 'en', attempts: 4, accuracy: 0.86 },
@@ -162,7 +161,7 @@ async function seedUsers() {
   let admin = await User.findOne({ email: ADMIN_EMAIL });
   if (!admin) {
     admin = await User.create({
-      name: 'Sindh Smart Quiz Admin',
+      name: ADMIN_NAME,
       email: ADMIN_EMAIL,
       password: ADMIN_PASSWORD,
       role: 'admin',

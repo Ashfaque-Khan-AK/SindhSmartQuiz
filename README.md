@@ -94,13 +94,19 @@ CLIENT_URL=http://localhost:5173
 
 For Atlas, replace `MONGODB_URI` with your `mongodb+srv://…` connection string.
 
-### 3. Seed demo data
+### 3. Seed data
 
 ```bash
 npm run seed
 ```
 
 Use `npm run seed:fresh` to wipe the quiz collections first. The seeder is idempotent.
+
+To create or reset only the administrator account without touching any other data:
+
+```bash
+npm run seed:admin
+```
 
 Seeded data:
 
@@ -128,7 +134,9 @@ npm run dev:server
 npm run dev:client
 ```
 
-## Demo Accounts
+## Seeded Accounts (development)
+
+These accounts are created by the seeder for local development. Change the passwords before any public deployment.
 
 | Role | Email | Password |
 |---|---|---|
@@ -147,8 +155,9 @@ Admin login is separated at `/admin/login`. Admin accounts cannot access student
 | `npm run dev` | Run API and Vite together with `concurrently` |
 | `npm run dev:server` | Run the Express API with file watching |
 | `npm run dev:client` | Run the Vite dev server |
-| `npm run seed` | Seed demo data |
-| `npm run seed:fresh` | Reset and reseed demo data |
+| `npm run seed` | Seed data |
+| `npm run seed:admin` | Create or reset the seeded administrator account |
+| `npm run seed:fresh` | Reset and reseed all data |
 | `npm run build` | Production build of the client |
 | `npm start` | Start the API without file watching |
 
