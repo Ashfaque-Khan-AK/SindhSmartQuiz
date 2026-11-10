@@ -17,6 +17,16 @@ A gamified, trilingual quiz platform for students in grades 6–10 across Sindh.
 - **Admin panel** — student access control, grade/subject/topic/question CRUD, attempt explorer, Recharts reports.
 - **Responsive design** — mobile drawer navigation, accessible forms, friendly loading/empty/error states.
 
+## Deployment
+
+The project is ready for a split deployment:
+
+- React frontend → Netlify
+- Express API → Back4App Containers
+- Database → MongoDB Atlas
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for the complete step-by-step guide, environment variables and verification checklist.
+
 ## Tech Stack
 
 | Layer | Technology |
