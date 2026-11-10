@@ -188,7 +188,7 @@ If it does not, set:
 |---|---|
 | Base directory | `client` |
 | Build command | `npm run build` |
-| Publish directory | `client/dist` |
+| Publish directory | `dist` (relative to `client`) |
 | Node version | `20` |
 
 The repository's `netlify.toml` already sets the base to `client`, the publish directory to `dist`, and adds the React Router redirect.
