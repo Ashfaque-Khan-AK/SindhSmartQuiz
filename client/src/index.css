@@ -1,0 +1,116 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-base-200 text-base-content antialiased;
+    font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    min-height: 100vh;
+  }
+
+  [dir='rtl'] body {
+    font-family: 'Noto Naskh Arabic', 'Inter', serif;
+    letter-spacing: 0;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-bold tracking-tight;
+  }
+
+  [dir='rtl'] h1,
+  [dir='rtl'] h2,
+  [dir='rtl'] h3,
+  [dir='rtl'] h4 {
+    letter-spacing: 0;
+  }
+
+  input,
+  select,
+  textarea {
+    @apply text-base;
+  }
+
+  :focus-visible {
+    @apply outline-none ring-2 ring-primary/60 ring-offset-2 ring-offset-base-100;
+  }
+}
+
+@layer components {
+  .app-card {
+    @apply rounded-2xl bg-base-100 shadow-soft ring-1 ring-base-300/70;
+  }
+
+  .app-input {
+    @apply input input-bordered w-full rounded-xl bg-base-100 focus:border-primary focus:outline-none;
+  }
+
+  .app-select {
+    @apply select select-bordered w-full rounded-xl bg-base-100 focus:border-primary focus:outline-none;
+  }
+
+  .app-textarea {
+    @apply textarea textarea-bordered w-full rounded-xl bg-base-100 focus:border-primary focus:outline-none;
+  }
+
+  .app-table {
+    @apply w-full text-sm;
+  }
+
+  .app-table thead th {
+    @apply whitespace-nowrap px-4 py-3 text-start text-xs font-semibold uppercase tracking-wide text-base-content/60;
+  }
+
+  .app-table tbody td {
+    @apply border-t border-base-200 px-4 py-3 align-middle;
+  }
+
+  .app-table tbody tr:hover {
+    @apply bg-base-200/50;
+  }
+
+  .section-label {
+    @apply inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary;
+  }
+
+  .gradient-text {
+    @apply bg-gradient-to-r from-primary via-teal-500 to-secondary bg-clip-text text-transparent;
+  }
+
+  .hero-mesh {
+    background-image:
+      radial-gradient(circle at 15% 20%, rgba(15, 118, 110, 0.18), transparent 42%),
+      radial-gradient(circle at 85% 10%, rgba(245, 158, 11, 0.2), transparent 45%),
+      radial-gradient(circle at 70% 90%, rgba(99, 102, 241, 0.15), transparent 40%);
+  }
+
+  .nav-item {
+    @apply flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-base-content/70 transition hover:bg-base-200 hover:text-base-content;
+  }
+
+  .nav-item-active {
+    @apply bg-primary/10 text-primary hover:bg-primary/15 hover:text-primary;
+  }
+}
+
+@layer utilities {
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-base-300;
+  }
+}
