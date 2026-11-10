@@ -5,7 +5,7 @@ dotenv.config();
 function normalizeMongoUri(value) {
   if (value == null) return '';
 
-  let uri = String(value).trim();
+  let uri = String(value).replace(/^[\uFEFF\u200B-\u200D]+/, '').trim();
 
   // Strip surrounding quotes, which are easy to paste accidentally.
   if (
@@ -18,7 +18,7 @@ function normalizeMongoUri(value) {
   }
 
   // Strip an accidental "MONGO_URI=" / "MONGODB_URI=" prefix.
-  uri = uri.replace(/^(?:MONGODB_URI|MONGO_URI)\s*=\s*/i, '').trim();
+  uri = uri.replace(/^(?:export\s+)?(?:MONGODB_URI|MONGO_URI)\s*=\s*/i, '').trim();
 
   return uri;
 }
