@@ -313,3 +313,87 @@ VITE_API_URL=https://api.yourdomain.com/api/v1
 - [ ] Admin dashboard tested
 - [ ] Direct route refresh tested
 - [ ] `.env` never committed
+
+---
+
+## 7. Alternative backend: Vercel (free)
+
+Back4App's free container URL is temporary and expires 60 minutes after deployment, so it is only suitable for a short demo. The same Express API can run on Vercel as a serverless function.
+
+The repository is already prepared for Vercel:
+
+- `server/vercel.json` selects the Express framework preset.
+- `server/src/app.js` exports the Express app and ensures the MongoDB connection exists on every request.
+- `server/src/local.js` is still used for local development and Back4App.
+- The Mongoose connection is cached and uses a small connection pool (`maxPoolSize: 5`) for serverless execution.
+
+### 7.1 Import the project
+
+1. Go to <https://vercel.com/new>.
+2. Import `Ashfaque-Khan-AK/SindhSmartQuiz`.
+3. Set **Root Directory** to:
+
+```text
+server
+```
+
+4. Framework Preset: **Express** (detected automatically).
+5. Leave Build Command and Output Directory empty/default.
+6. Add these environment variables:
+
+```env
+NODE_ENV=production
+MONGODB_URI=mongodb+srv://USER:PASSWORD@cluster0.xxxxx.mongodb.net/SindhSmartQuiz?retryWrites=true&w=majority
+JWT_SECRET=REPLACE_WITH_A_LONG_RANDOM_SECRET
+JWT_EXPIRES_IN=7d
+CLIENT_URL=https://sindhsmartquiz.netlify.app
+```
+
+Do **not** add `PORT`; Vercel handles the port.
+
+7. Click **Deploy** and wait for the build to finish.
+
+### 7.2 Test the API
+
+Replace `<project>` with your Vercel project name:
+
+```text
+https://<project>.vercel.app/api/v1/health
+```
+
+Expected response:
+
+```json
+{
+  "success": true,
+  "message": "Sindh Smart Quiz API",
+  "data": { "status": "healthy" }
+}
+```
+
+If the database connection fails, check:
+
+- Atlas **Network Access** allows `0.0.0.0/0` (Vercel egress IPs are dynamic).
+- `MONGODB_URI` is the full Atlas URI, including the `/SindhSmartQuiz` database name.
+- The database user password is URL-encoded if it contains special characters.
+
+### 7.3 Point Netlify at Vercel
+
+In Netlify, set:
+
+```env
+VITE_API_URL=https://<project>.vercel.app/api/v1
+```
+
+Then trigger:
+
+**Deploys → Trigger deploy → Clear cache and deploy site.**
+
+### 7.4 Vercel limits and notes
+
+- The Vercel Hobby plan is free for personal, non-commercial projects.
+- Functions are serverless: the first request after idle time may have a short cold start.
+- Hobby functions have a 300-second maximum duration and a 4.5 MB request/response body limit; this API is well below both.
+- `express-rate-limit` uses in-memory storage, so limits are per function instance on Vercel. That is acceptable for this app, but use a shared store if you need strict global rate limiting.
+- Keep the Atlas cluster reachable from `0.0.0.0/0` unless you configure a fixed-IP proxy.
+

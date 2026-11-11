@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import cors from 'cors';
 import express from 'express';
 import morgan from 'morgan';
+import { ensureDatabase } from './config/db.js';
 import { config } from './config/env.js';
 import routes from './routes/index.js';
 import { errorHandler, notFoundHandler } from './middleware/error.js';
@@ -29,6 +30,19 @@ app.use(
 );
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true }));
+
+// Back4App and local development connect once at startup. Vercel Functions are
+// serverless, so make sure the cached connection exists before handling a request.
+app.use(async (req, _res, next) => {
+  if (req.method === 'OPTIONS') return next();
+
+  try {
+    await ensureDatabase();
+    return next();
+  } catch (error) {
+    return next(error);
+  }
+});
 
 if (!config.isProduction) {
   app.use(morgan('dev'));

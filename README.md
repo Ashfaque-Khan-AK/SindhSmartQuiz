@@ -61,8 +61,8 @@ Quiz Game/
 │       ├── seed/               # demo data seeder
 │       ├── services/           # business logic
 │       ├── utils/              # ApiError, validators, response helpers
-│       ├── app.js
-│       └── server.js
+│       ├── app.js               # Express app exported for Vercel/serverless
+│       └── local.js             # local/Back4App HTTP listener
 ├── IMPLEMENTATION_PLAN.md      # build tracker
 ├── package.json                # root scripts
 └── README.md

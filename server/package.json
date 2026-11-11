@@ -4,10 +4,10 @@
   "private": true,
   "type": "module",
   "description": "Express + MongoDB API for Sindh Smart Quiz",
-  "main": "src/server.js",
+  "main": "src/local.js",
   "scripts": {
-    "dev": "node --watch src/server.js",
-    "start": "node src/server.js",
+    "dev": "node --watch src/local.js",
+    "start": "node src/local.js",
     "seed": "node src/seed/index.js",
     "seed:admin": "node src/seed/admin.js"
   },

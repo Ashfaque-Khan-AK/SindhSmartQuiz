@@ -1,14 +1,40 @@
 import mongoose from 'mongoose';
 import { config } from './env.js';
 
-export async function connectDatabase() {
-  mongoose.set('strictQuery', true);
+mongoose.set('strictQuery', true);
 
+let connectionPromise = null;
+
+/**
+ * Ensure Mongoose is connected. Safe to call on every request and on a
+ * serverless platform where the module can be reused between invocations.
+ */
+export async function ensureDatabase() {
+  if (mongoose.connection.readyState === 1) {
+    return mongoose.connection;
+  }
+
+  if (!connectionPromise) {
+    connectionPromise = mongoose
+      .connect(config.mongoUri, {
+        serverSelectionTimeoutMS: 10000,
+        maxPoolSize: 5,
+        autoIndex: !config.isProduction,
+      })
+      .catch((error) => {
+        // Allow the next request to retry after a failed cold-start connection.
+        connectionPromise = null;
+        throw error;
+      });
+  }
+
+  await connectionPromise;
+  return mongoose.connection;
+}
+
+export async function connectDatabase() {
   try {
-    await mongoose.connect(config.mongoUri, {
-      serverSelectionTimeoutMS: 10000,
-      autoIndex: !config.isProduction,
-    });
+    await ensureDatabase();
     console.log(`[db] Connected to MongoDB (${mongoose.connection.name})`);
   } catch (error) {
     console.error('[db] MongoDB connection failed:', error.message);
@@ -18,5 +44,6 @@ export async function connectDatabase() {
 }
 
 export async function disconnectDatabase() {
+  connectionPromise = null;
   await mongoose.connection.close();
 }
