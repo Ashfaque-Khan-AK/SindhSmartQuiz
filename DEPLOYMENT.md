@@ -322,10 +322,12 @@ Back4App's free container URL is temporary and expires 60 minutes after deployme
 
 The repository is already prepared for Vercel:
 
-- `server/vercel.json` selects the Express framework preset.
+- `server/vercel.json` selects the Express framework preset and runs the function in Mumbai (`bom1`), close to the Atlas cluster. If your Atlas cluster is in another region, change `regions` to the nearest Vercel region.
 - `server/src/app.js` exports the Express app and ensures the MongoDB connection exists on every request.
 - `server/src/local.js` is still used for local development and Back4App.
 - The Mongoose connection is cached and uses a small connection pool (`maxPoolSize: 5`) for serverless execution.
+- Production has `autoIndex` disabled, so run `npm run indexes` once after changing model indexes.
+- CORS preflight responses are cached for 24 hours (`Access-Control-Max-Age`) to avoid an extra round trip on every authenticated request.
 
 ### 7.1 Import the project
 
@@ -351,7 +353,13 @@ CLIENT_URL=https://sindhsmartquiz.netlify.app
 
 Do **not** add `PORT`; Vercel handles the port.
 
-7. Click **Deploy** and wait for the build to finish.
+7. From the `server` folder, create the MongoDB indexes once:
+
+```bash
+npm run indexes
+```
+
+8. Click **Deploy** and wait for the build to finish.
 
 ### 7.2 Test the API
 

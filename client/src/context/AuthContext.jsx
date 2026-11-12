@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
-import { authApi } from '../services';
+import { authApi, clearApiCache } from '../services';
 
 const TOKEN_KEY = 'ssq_token';
 const USER_KEY = 'ssq_user';
@@ -27,6 +27,7 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(() => Boolean(localStorage.getItem(TOKEN_KEY)));
 
   const logout = useCallback((message) => {
+    clearApiCache();
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
     setToken(null);

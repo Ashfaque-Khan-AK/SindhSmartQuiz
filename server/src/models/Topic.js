@@ -36,6 +36,7 @@ const topicSchema = new mongoose.Schema(
 );
 
 topicSchema.index({ subjectId: 1, gradeId: 1, name: 1 }, { unique: true });
+topicSchema.index({ gradeId: 1, subjectId: 1, isActive: 1, name: 1 });
 
 const Topic = mongoose.model('Topic', topicSchema);
 

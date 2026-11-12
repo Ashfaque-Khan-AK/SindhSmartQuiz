@@ -127,27 +127,28 @@ export async function startQuiz(student, payload = {}) {
   const grade = await resolveGrade(student, payload.gradeId);
 
   validators.objectId(payload.subjectId, 'subject');
-  const subject = await Subject.findOne({
-    _id: payload.subjectId,
-    isActive: true,
-    grades: grade._id,
-  });
+  if (payload.topicId) validators.objectId(payload.topicId, 'topic');
+
+  const [subject, topic] = await Promise.all([
+    Subject.findOne({
+      _id: payload.subjectId,
+      isActive: true,
+      grades: grade._id,
+    }),
+    payload.topicId
+      ? Topic.findOne({
+          _id: payload.topicId,
+          subjectId: payload.subjectId,
+          gradeId: grade._id,
+          isActive: true,
+        })
+      : Promise.resolve(null),
+  ]);
 
   if (!subject) {
     throw ApiError.notFound('This subject is not available for the selected grade');
   }
-
-  let topic = null;
-  if (payload.topicId) {
-    validators.objectId(payload.topicId, 'topic');
-    topic = await Topic.findOne({
-      _id: payload.topicId,
-      subjectId: subject._id,
-      gradeId: grade._id,
-      isActive: true,
-    });
-    if (!topic) throw ApiError.notFound('This topic is not available');
-  }
+  if (payload.topicId && !topic) throw ApiError.notFound('This topic is not available');
 
   const questions = await sampleQuestions({
     gradeId: grade._id,
@@ -334,21 +335,24 @@ export async function submitQuiz(student, attemptId, answers = [], { auto = fals
     return { ...existing, alreadySubmitted: true };
   }
 
-  await User.updateOne({ _id: student._id }, { $inc: { totalXP: xpEarned } });
-  const studentAfterQuizXP = await User.findById(student._id);
-  await evaluateAchievements(studentAfterQuizXP, claimed);
-  const finalStudent = await User.findById(student._id);
+  const studentAfterQuizXP =
+    (await User.findByIdAndUpdate(
+      student._id,
+      { $inc: { totalXP: xpEarned } },
+      { new: true }
+    )) || student;
+  const achievementResult = await evaluateAchievements(studentAfterQuizXP, claimed);
   const result = await buildResult(claimed._id, student._id);
 
   return {
     ...result,
     xpEarned,
-    studentTotalXP: finalStudent?.totalXP ?? 0,
+    studentTotalXP: achievementResult.totalXP ?? studentAfterQuizXP.totalXP ?? 0,
   };
 }
 
 async function buildResult(attemptId, studentId) {
-  const attempt = await QuizAttempt.findById(attemptId)
+  const attempt = await QuizAttempt.findOne({ _id: attemptId, studentId })
     .populate('gradeId', 'name number')
     .populate('subjectId', 'name icon color')
     .populate('topicId', 'name')
@@ -394,13 +398,11 @@ async function buildResult(attemptId, studentId) {
 
 export async function getResult(student, attemptId) {
   validators.objectId(attemptId, 'attempt');
-  const attempt = await QuizAttempt.findOne({ _id: attemptId, studentId: student._id }).lean();
-  if (!attempt) throw ApiError.notFound('Quiz attempt not found');
-  if (attempt.status !== 'submitted') {
+  const result = await buildResult(attemptId, student._id);
+  if (result.status !== 'submitted') {
     throw ApiError.badRequest('This quiz has not been submitted yet');
   }
 
-  const result = await buildResult(attempt._id, student._id);
   return { ...result, studentTotalXP: student.totalXP };
 }
 

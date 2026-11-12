@@ -71,6 +71,7 @@ const questionSchema = new mongoose.Schema(
 
 questionSchema.index({ gradeId: 1, subjectId: 1, topicId: 1, isActive: 1 });
 questionSchema.index({ gradeId: 1, subjectId: 1, difficulty: 1, isActive: 1 });
+questionSchema.index({ topicId: 1, isActive: 1 });
 
 questionSchema.pre('validate', function ensureEnglish(next) {
   if (!this.question || !this.question.en) {

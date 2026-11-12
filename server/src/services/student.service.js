@@ -109,14 +109,13 @@ export async function getSubjectsForGrade(gradeObjectId, studentId) {
 }
 
 export async function getDashboard(student) {
-  const grade = student.grade
-    ? await Grade.findOne({ number: student.grade }).lean()
-    : null;
-
-  const attempts = await QuizAttempt.find({ studentId: student._id, status: 'submitted' })
-    .select('percentage submittedAt')
-    .sort({ submittedAt: -1 })
-    .lean();
+  const [grade, attempts] = await Promise.all([
+    student.grade ? Grade.findOne({ number: student.grade }).lean() : Promise.resolve(null),
+    QuizAttempt.find({ studentId: student._id, status: 'submitted' })
+      .select('percentage submittedAt')
+      .sort({ submittedAt: -1 })
+      .lean(),
+  ]);
 
   const quizzesAttempted = attempts.length;
   const averageScore = quizzesAttempted
@@ -126,17 +125,60 @@ export async function getDashboard(student) {
   const [subjects, recentAttempts, recentAchievements, totalAchievements, earnedCount] =
     await Promise.all([
       grade ? getSubjectsForGrade(grade._id, student._id) : [],
-      QuizAttempt.find({ studentId: student._id, status: 'submitted' })
-        .sort({ submittedAt: -1 })
-        .limit(5)
-        .populate('subjectId', 'name icon color')
-        .populate('topicId', 'name')
-        .lean(),
-      StudentAchievement.find({ studentId: student._id })
-        .sort({ earnedAt: -1 })
-        .limit(4)
-        .populate('achievementId')
-        .lean(),
+      QuizAttempt.aggregate([
+        { $match: { studentId: student._id, status: 'submitted' } },
+        { $sort: { submittedAt: -1 } },
+        { $limit: 5 },
+        {
+          $lookup: {
+            from: 'subjects',
+            localField: 'subjectId',
+            foreignField: '_id',
+            as: 'subject',
+          },
+        },
+        { $unwind: { path: '$subject', preserveNullAndEmptyArrays: true } },
+        {
+          $lookup: {
+            from: 'topics',
+            localField: 'topicId',
+            foreignField: '_id',
+            as: 'topic',
+          },
+        },
+        { $unwind: { path: '$topic', preserveNullAndEmptyArrays: true } },
+        {
+          $project: {
+            subjectId: '$subject',
+            topicId: '$topic',
+            totalQuestions: 1,
+            correctAnswers: 1,
+            incorrectAnswers: 1,
+            unanswered: 1,
+            score: 1,
+            percentage: 1,
+            xpEarned: 1,
+            timeTaken: 1,
+            submittedAt: 1,
+            status: 1,
+          },
+        },
+      ]),
+      StudentAchievement.aggregate([
+        { $match: { studentId: student._id } },
+        { $sort: { earnedAt: -1 } },
+        { $limit: 4 },
+        {
+          $lookup: {
+            from: 'achievements',
+            localField: 'achievementId',
+            foreignField: '_id',
+            as: 'achievement',
+          },
+        },
+        { $unwind: { path: '$achievement', preserveNullAndEmptyArrays: true } },
+        { $project: { achievementId: '$achievement', earnedAt: 1 } },
+      ]),
       Achievement.countDocuments({ isActive: true }),
       StudentAchievement.countDocuments({ studentId: student._id }),
     ]);
@@ -189,16 +231,18 @@ export async function getTopics(student, subjectId, gradeId) {
   validators.objectId(subjectId, 'subject');
   const grade = await resolveGrade(student, gradeId);
 
-  const subject = await Subject.findOne({ _id: subjectId, isActive: true, grades: grade._id }).lean();
-  if (!subject) throw ApiError.notFound('Subject not found for this grade');
+  const [subject, topics] = await Promise.all([
+    Subject.findOne({ _id: subjectId, isActive: true, grades: grade._id }).lean(),
+    Topic.find({
+      subjectId,
+      gradeId: grade._id,
+      isActive: true,
+    })
+      .sort({ name: 1 })
+      .lean(),
+  ]);
 
-  const topics = await Topic.find({
-    subjectId: subject._id,
-    gradeId: grade._id,
-    isActive: true,
-  })
-    .sort({ name: 1 })
-    .lean();
+  if (!subject) throw ApiError.notFound('Subject not found for this grade');
 
   if (!topics.length) {
     return {

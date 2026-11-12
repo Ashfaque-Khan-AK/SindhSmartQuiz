@@ -116,6 +116,9 @@ const quizAttemptSchema = new mongoose.Schema(
 );
 
 quizAttemptSchema.index({ studentId: 1, status: 1, submittedAt: -1 });
+quizAttemptSchema.index({ studentId: 1, gradeId: 1, status: 1, subjectId: 1 });
+quizAttemptSchema.index({ studentId: 1, subjectId: 1, status: 1, submittedAt: -1 });
+quizAttemptSchema.index({ status: 1, submittedAt: -1 });
 quizAttemptSchema.index({ submittedAt: -1 });
 quizAttemptSchema.index({ studentId: 1, createdAt: -1 });
 

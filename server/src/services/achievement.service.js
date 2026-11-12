@@ -69,6 +69,7 @@ export async function evaluateAchievements(student, attempt) {
   }
 
   const achievementXP = newlyEarned.reduce((sum, item) => sum + (item.xpReward || 0), 0);
+  let totalXP = student.totalXP || 0;
 
   if (newlyEarned.length) {
     await QuizAttempt.updateOne(
@@ -82,9 +83,14 @@ export async function evaluateAchievements(student, attempt) {
     );
 
     if (achievementXP > 0) {
-      await User.updateOne({ _id: student._id }, { $inc: { totalXP: achievementXP } });
+      const updated = await User.findByIdAndUpdate(
+        student._id,
+        { $inc: { totalXP: achievementXP } },
+        { new: true, select: 'totalXP' }
+      ).lean();
+      totalXP = updated?.totalXP ?? totalXP + achievementXP;
     }
   }
 
-  return { newlyEarned, achievementXP, snapshot };
+  return { newlyEarned, achievementXP, snapshot, totalXP };
 }

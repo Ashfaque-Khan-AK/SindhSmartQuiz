@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { connectMongo } from './atlas.js';
 import { config } from './env.js';
 
 mongoose.set('strictQuery', true);
@@ -15,17 +16,15 @@ export async function ensureDatabase() {
   }
 
   if (!connectionPromise) {
-    connectionPromise = mongoose
-      .connect(config.mongoUri, {
-        serverSelectionTimeoutMS: 10000,
-        maxPoolSize: 5,
-        autoIndex: !config.isProduction,
-      })
-      .catch((error) => {
-        // Allow the next request to retry after a failed cold-start connection.
-        connectionPromise = null;
-        throw error;
-      });
+    connectionPromise = connectMongo(config.mongoUri, {
+      serverSelectionTimeoutMS: 10000,
+      maxPoolSize: 5,
+      autoIndex: !config.isProduction,
+    }).catch((error) => {
+      // Allow the next request to retry after a failed cold-start connection.
+      connectionPromise = null;
+      throw error;
+    });
   }
 
   await connectionPromise;

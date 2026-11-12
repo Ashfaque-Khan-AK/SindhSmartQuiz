@@ -39,6 +39,7 @@ const subjectSchema = new mongoose.Schema(
 );
 
 subjectSchema.index({ name: 1 });
+subjectSchema.index({ grades: 1, isActive: 1, name: 1 });
 
 const Subject = mongoose.model('Subject', subjectSchema);
 
