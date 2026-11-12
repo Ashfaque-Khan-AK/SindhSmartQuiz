@@ -11,10 +11,15 @@ import { errorHandler, notFoundHandler } from './middleware/error.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
-const allowedOrigins = config.clientUrl
-  .split(',')
-  .map((origin) => origin.trim())
-  .filter(Boolean);
+const allowedOrigins = Array.from(
+  new Set([
+    'https://sindhsmartquiz.netlify.app',
+    ...config.clientUrl
+      .split(',')
+      .map((origin) => origin.trim().replace(/\/+$/, ''))
+      .filter(Boolean),
+  ])
+);
 
 app.set('trust proxy', 1);
 app.use(
@@ -22,7 +27,7 @@ app.use(
     origin: config.isProduction
       ? (origin, callback) => {
           if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
-          return callback(new Error(`CORS blocked for origin: ${origin}`));
+          return callback(null, false);
         }
       : true,
     credentials: true,
